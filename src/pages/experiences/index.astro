@@ -1,0 +1,22 @@
+---
+import Base from "../../layouts/Base.astro";
+import { getCollection } from "astro:content";
+
+const experiences = (await getCollection("experiences", ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+
+<Base title="Experiences">
+  <h1 class="page-title">Experiences</h1>
+  {experiences.length === 0 && <p>Nothing yet.</p>}
+  <ul class="post-list">
+    {experiences.map((exp) => (
+      <li>
+        <a href={`/experiences/${exp.id}`}>{exp.data.title}</a>
+        <time datetime={exp.data.date.toISOString()}>
+          {exp.data.date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
+        </time>
+      </li>
+    ))}
+  </ul>
+</Base>

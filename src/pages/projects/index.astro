@@ -1,0 +1,39 @@
+---
+import Base from "../../layouts/Base.astro";
+import { getCollection } from "astro:content";
+
+const projects = (await getCollection("projects", ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+
+<Base title="Projects">
+  <h1 class="page-title">Projects</h1>
+  {projects.length === 0 && <p>Nothing yet.</p>}
+  <ul class="link-list">
+    {projects.map((project) => (
+      <li>
+        <div class="link-meta">
+          <a href={project.data.url ?? `/projects/${project.id}`}>
+            {project.data.title}
+          </a>
+          <time datetime={project.data.date.toISOString()}>
+            {project.data.date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
+          </time>
+        </div>
+        {project.data.description && <p>{project.data.description}</p>}
+        {project.data.github && (
+          <p>
+            <a href={project.data.github} target="_blank" rel="noopener noreferrer" style="font-size:0.8125rem;color:var(--text-muted)">
+              GitHub ↗
+            </a>
+          </p>
+        )}
+        {project.data.tags.length > 0 && (
+          <ul class="tags">
+            {project.data.tags.map((tag) => <li>{tag}</li>)}
+          </ul>
+        )}
+      </li>
+    ))}
+  </ul>
+</Base>

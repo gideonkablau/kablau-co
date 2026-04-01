@@ -1,0 +1,42 @@
+---
+import Base from "../../layouts/Base.astro";
+import { getCollection } from "astro:content";
+
+const items = (await getCollection("stack"))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const categories: { key: "tools" | "gear" | "links" | "reads"; label: string }[] = [
+  { key: "tools", label: "Tools" },
+  { key: "gear", label: "Gear" },
+  { key: "links", label: "Links" },
+  { key: "reads", label: "Reads" },
+];
+
+const grouped = Object.fromEntries(
+  categories.map(({ key }) => [key, items.filter((i) => i.data.category === key)])
+);
+---
+
+<Base title="Stack">
+  <h1 class="page-title">Stack</h1>
+  {categories.map(({ key, label }) => grouped[key].length > 0 && (
+    <section>
+      <div class="section-heading">
+        <h2>{label}</h2>
+      </div>
+      <ul class="link-list">
+        {grouped[key].map((item) => (
+          <li>
+            <div class="link-meta">
+              {item.data.url
+                ? <a href={item.data.url} target="_blank" rel="noopener noreferrer">{item.data.title}</a>
+                : <span>{item.data.title}</span>
+              }
+            </div>
+            {item.data.description && <p>{item.data.description}</p>}
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))}
+</Base>

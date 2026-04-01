@@ -1,0 +1,57 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "kablau.co" } = Astro.props;
+
+const navLinks = [
+  { href: "/thoughts", label: "Thoughts" },
+  { href: "/projects", label: "Projects" },
+  { href: "/experiences", label: "Experiences" },
+  { href: "/stack", label: "Stack" },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <title>{title} — kablau.co</title>
+  </head>
+  <body>
+    <header>
+      <div class="wrapper">
+        <nav>
+          <a href="/" class="site-name">kablau.co</a>
+          <div class="nav-links">
+            {navLinks.map(({ href, label }) => (
+              <a href={href} class={currentPath.startsWith(href) ? "active" : ""}>
+                {label}
+              </a>
+            ))}
+          </div>
+        </nav>
+      </div>
+    </header>
+    <main>
+      <div class="wrapper">
+        <slot />
+      </div>
+    </main>
+    <footer>
+      <div class="wrapper">
+        <p>&copy; {new Date().getFullYear()} Gideon Kablau</p>
+      </div>
+    </footer>
+  </body>
+</html>
