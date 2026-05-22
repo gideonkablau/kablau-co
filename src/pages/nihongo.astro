@@ -24,7 +24,8 @@
     --faint: #444441;
     --hiragana: #9F97DD;
     --katakana: #5DCAA5;
-    --mixed: #EF9F27;
+    --kanji: #E87B6A;
+    --all: #EF9F27;
     --radius: 16px;
     --font: -apple-system, 'Hiragino Sans', 'Yu Gothic', sans-serif;
   }
@@ -103,7 +104,8 @@
   .deck-btn.active .dot { opacity: 1; }
   .deck-btn.active[data-id="hiragana"] { background: var(--hiragana); }
   .deck-btn.active[data-id="katakana"] { background: var(--katakana); }
-  .deck-btn.active[data-id="mixed"] { background: var(--mixed); }
+  .deck-btn.active[data-id="kanji"] { background: var(--kanji); }
+  .deck-btn.active[data-id="all"] { background: var(--all); }
 
   .scene {
     width: 100%;
@@ -150,6 +152,7 @@
     letter-spacing: 0.08em;
   }
   .char-back { font-size: clamp(44px, 10vw, 64px); color: var(--muted); font-weight: 300; margin-top: 4px; }
+  .meaning { font-size: 13px; color: var(--faint); letter-spacing: 0.04em; margin-top: 2px; }
   .face-hint {
     position: absolute;
     bottom: 16px;
@@ -308,10 +311,56 @@ const katakana = [
   {c:'パ',r:'pa'},{c:'ピ',r:'pi'},{c:'プ',r:'pu'},{c:'ペ',r:'pe'},{c:'ポ',r:'po'},
 ];
 
+const kanji = [
+  {c:'一',r:'ichi',m:'one'},{c:'二',r:'ni',m:'two'},{c:'三',r:'san',m:'three'},
+  {c:'四',r:'shi / yon',m:'four'},{c:'五',r:'go',m:'five'},{c:'六',r:'roku',m:'six'},
+  {c:'七',r:'shichi / nana',m:'seven'},{c:'八',r:'hachi',m:'eight'},{c:'九',r:'ku / kyuu',m:'nine'},
+  {c:'十',r:'juu',m:'ten'},{c:'百',r:'hyaku',m:'hundred'},{c:'千',r:'sen',m:'thousand'},
+  {c:'万',r:'man',m:'ten thousand'},{c:'円',r:'en',m:'yen / circle'},
+  {c:'年',r:'nen / toshi',m:'year'},{c:'月',r:'getsu / tsuki',m:'month / moon'},
+  {c:'日',r:'nichi / hi',m:'day / sun'},{c:'時',r:'ji / toki',m:'time / hour'},
+  {c:'分',r:'fun / pun',m:'minute'},{c:'半',r:'han',m:'half'},
+  {c:'今',r:'ima',m:'now'},{c:'前',r:'mae',m:'before / front'},{c:'後',r:'ato',m:'after / back'},
+  {c:'午',r:'go',m:'noon'},{c:'毎',r:'mai',m:'every'},{c:'何',r:'nani / nan',m:'what'},
+  {c:'山',r:'yama',m:'mountain'},{c:'川',r:'kawa',m:'river'},{c:'田',r:'ta',m:'rice field'},
+  {c:'木',r:'ki',m:'tree'},{c:'花',r:'hana',m:'flower'},{c:'空',r:'sora',m:'sky'},
+  {c:'雨',r:'ame',m:'rain'},{c:'火',r:'hi',m:'fire'},{c:'水',r:'mizu',m:'water'},
+  {c:'土',r:'tsuchi',m:'earth / soil'},{c:'金',r:'kin',m:'gold / money'},
+  {c:'人',r:'hito',m:'person'},{c:'男',r:'otoko',m:'man'},{c:'女',r:'onna',m:'woman'},
+  {c:'子',r:'ko',m:'child'},{c:'口',r:'kuchi',m:'mouth'},{c:'目',r:'me',m:'eye'},
+  {c:'耳',r:'mimi',m:'ear'},{c:'手',r:'te',m:'hand'},{c:'足',r:'ashi',m:'foot / leg'},
+  {c:'力',r:'chikara',m:'power / strength'},
+  {c:'上',r:'ue',m:'up / above'},{c:'下',r:'shita',m:'down / below'},
+  {c:'中',r:'naka',m:'inside / middle'},{c:'右',r:'migi',m:'right'},{c:'左',r:'hidari',m:'left'},
+  {c:'大',r:'oo / dai',m:'big'},{c:'小',r:'chii / shou',m:'small'},
+  {c:'高',r:'taka / kou',m:'high / expensive'},{c:'安',r:'yasu / an',m:'cheap / safe'},
+  {c:'新',r:'atara / shin',m:'new'},{c:'古',r:'furu / ko',m:'old'},
+  {c:'長',r:'naga / chou',m:'long'},{c:'白',r:'shiro',m:'white'},{c:'黒',r:'kuro',m:'black'},
+  {c:'赤',r:'aka',m:'red'},{c:'青',r:'ao',m:'blue'},
+  {c:'学',r:'mana / gaku',m:'study / learn'},{c:'校',r:'kou',m:'school'},
+  {c:'先',r:'saki / sen',m:'ahead / previous'},{c:'生',r:'sei / u',m:'life / birth'},
+  {c:'本',r:'hon',m:'book / origin'},{c:'文',r:'bun / mon',m:'writing / sentence'},
+  {c:'字',r:'ji',m:'character / letter'},{c:'語',r:'go',m:'language'},
+  {c:'国',r:'kuni / koku',m:'country'},{c:'外',r:'soto / gai',m:'outside'},
+  {c:'電',r:'den',m:'electricity'},{c:'車',r:'kuruma / sha',m:'car / vehicle'},
+  {c:'駅',r:'eki',m:'station'},
+  {c:'食',r:'tabe / shoku',m:'eat / food'},{c:'飲',r:'nomu / in',m:'drink'},
+  {c:'見',r:'miru',m:'see / look'},{c:'聞',r:'kiku',m:'listen / hear'},
+  {c:'読',r:'yomu',m:'read'},{c:'書',r:'kaku',m:'write'},{c:'話',r:'hanasu',m:'speak'},
+  {c:'行',r:'iku',m:'go'},{c:'来',r:'kuru',m:'come'},{c:'帰',r:'kaeru',m:'return home'},
+  {c:'入',r:'hairu',m:'enter'},{c:'出',r:'deru',m:'exit'},{c:'会',r:'au',m:'meet'},
+  {c:'待',r:'matsu',m:'wait'},{c:'買',r:'kau',m:'buy'},{c:'立',r:'tatsu',m:'stand'},
+  {c:'起',r:'okiru',m:'wake up / rise'},{c:'寝',r:'neru',m:'sleep'},
+  {c:'名',r:'na / mei',m:'name'},{c:'気',r:'ki',m:'spirit / feeling'},
+  {c:'雪',r:'yuki',m:'snow'},{c:'風',r:'kaze',m:'wind'},{c:'海',r:'umi',m:'sea / ocean'},
+  {c:'山',r:'yama',m:'mountain'},{c:'道',r:'michi',m:'road / way'},
+];
+
 const DECKS = [
-  { id:'hiragana', label:'Hiragana', color:'var(--hiragana)' },
-  { id:'katakana', label:'Katakana', color:'var(--katakana)' },
-  { id:'mixed',    label:'Mixed',    color:'var(--mixed)' },
+  { id:'hiragana', label:'Hiragana' },
+  { id:'katakana', label:'Katakana' },
+  { id:'kanji',    label:'Kanji' },
+  { id:'all',      label:'All' },
 ];
 
 let active = new Set(['hiragana']);
@@ -325,11 +374,12 @@ function shuffle(a) {
 
 function buildQueue() {
   let cards=[];
-  if(active.has('mixed')){
-    cards=[...hiragana.map(c=>({...c,deck:'Hiragana'})),...katakana.map(c=>({...c,deck:'Katakana'}))];
+  if(active.has('all')){
+    cards=[...hiragana.map(c=>({...c,deck:'Hiragana'})),...katakana.map(c=>({...c,deck:'Katakana'})),...kanji.map(c=>({...c,deck:'Kanji'}))];
   } else {
     if(active.has('hiragana')) cards.push(...hiragana.map(c=>({...c,deck:'Hiragana'})));
     if(active.has('katakana')) cards.push(...katakana.map(c=>({...c,deck:'Katakana'})));
+    if(active.has('kanji')) cards.push(...kanji.map(c=>({...c,deck:'Kanji'})));
   }
   queue=shuffle(cards); idx=0; flipped=false;
 }
@@ -347,8 +397,8 @@ function renderDecks() {
 }
 
 function toggle(id) {
-  if(id==='mixed'){active.clear();if(!active.has('mixed'))active.add('mixed');}
-  else{active.delete('mixed');active.has(id)?active.delete(id):active.add(id);}
+  if(id==='all'){active.clear();active.add('all');}
+  else{active.delete('all');active.has(id)?active.delete(id):active.add(id);}
   if(!active.size) active.add(id);
   buildQueue(); renderDecks(); renderCard();
 }
@@ -380,6 +430,7 @@ function renderCard() {
           <span class="deck-badge">${card.deck}</span>
           <span class="romaji">${card.r}</span>
           <span class="char-back">${card.c}</span>
+          ${card.m ? `<span class="meaning">${card.m}</span>` : ''}
         </div>
       </div>
     </div>
