@@ -57,10 +57,11 @@
 }
 
 :root {
-  --bg: #f8f7f4;
-  --text: #111110;
-  --text-muted: #888884;
-  --border: #e2e1dc;
+  --bg: #0f0f0e;
+  --surface: #1a1a18;
+  --text: #f0ede6;
+  --text-muted: #888780;
+  --border: rgba(255,255,255,0.08);
   --max-width: 680px;
   --page-x: clamp(1.5rem, 5vw, 3rem);
 }
@@ -281,7 +282,7 @@ main .wrapper > * + * {
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--text-muted);
-  background: var(--border);
+  background: var(--surface);
   padding: 0.2em 0.5em;
   border-radius: 2px;
 }
@@ -352,13 +353,13 @@ main .wrapper > * + * {
 
 .prose code {
   font-size: 0.875em;
-  background: var(--border);
+  background: var(--surface);
   padding: 0.15em 0.35em;
   border-radius: 3px;
 }
 
 .prose pre {
-  background: var(--border);
+  background: var(--surface);
   padding: 1rem 1.25rem;
   border-radius: 4px;
   overflow-x: auto;
