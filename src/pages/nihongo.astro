@@ -75,7 +75,7 @@
   }
   .deck-btn {
     flex: 1;
-    min-width: 90px;
+    min-width: 80px;
     padding: 10px 12px;
     border-radius: 999px;
     border: 1px solid var(--border);
@@ -104,8 +104,8 @@
   .deck-btn.active .dot { opacity: 1; }
   .deck-btn.active[data-id="hiragana"] { background: var(--hiragana); }
   .deck-btn.active[data-id="katakana"] { background: var(--katakana); }
-  .deck-btn.active[data-id="kanji"] { background: var(--kanji); }
-  .deck-btn.active[data-id="all"] { background: var(--all); }
+  .deck-btn.active[data-id="kanji"]    { background: var(--kanji); }
+  .deck-btn.active[data-id="all"]      { background: var(--all); }
 
   .scene {
     width: 100%;
@@ -271,11 +271,11 @@
 </header>
 
 <div class="decks" id="deckSelector"></div>
-
 <div id="cardArea" style="width:100%;max-width:520px;"></div>
 
 <script>
 const hiragana = [
+  // Basic
   {c:'あ',r:'a'},{c:'い',r:'i'},{c:'う',r:'u'},{c:'え',r:'e'},{c:'お',r:'o'},
   {c:'か',r:'ka'},{c:'き',r:'ki'},{c:'く',r:'ku'},{c:'け',r:'ke'},{c:'こ',r:'ko'},
   {c:'さ',r:'sa'},{c:'し',r:'shi'},{c:'す',r:'su'},{c:'せ',r:'se'},{c:'そ',r:'so'},
@@ -286,14 +286,28 @@ const hiragana = [
   {c:'や',r:'ya'},{c:'ゆ',r:'yu'},{c:'よ',r:'yo'},
   {c:'ら',r:'ra'},{c:'り',r:'ri'},{c:'る',r:'ru'},{c:'れ',r:'re'},{c:'ろ',r:'ro'},
   {c:'わ',r:'wa'},{c:'を',r:'wo'},{c:'ん',r:'n'},
+  // Dakuten & handakuten
   {c:'が',r:'ga'},{c:'ぎ',r:'gi'},{c:'ぐ',r:'gu'},{c:'げ',r:'ge'},{c:'ご',r:'go'},
   {c:'ざ',r:'za'},{c:'じ',r:'ji'},{c:'ず',r:'zu'},{c:'ぜ',r:'ze'},{c:'ぞ',r:'zo'},
   {c:'だ',r:'da'},{c:'ぢ',r:'ji'},{c:'づ',r:'zu'},{c:'で',r:'de'},{c:'ど',r:'do'},
   {c:'ば',r:'ba'},{c:'び',r:'bi'},{c:'ぶ',r:'bu'},{c:'べ',r:'be'},{c:'ぼ',r:'bo'},
   {c:'ぱ',r:'pa'},{c:'ぴ',r:'pi'},{c:'ぷ',r:'pu'},{c:'ぺ',r:'pe'},{c:'ぽ',r:'po'},
+  // Yōon
+  {c:'きゃ',r:'kya'},{c:'きゅ',r:'kyu'},{c:'きょ',r:'kyo'},
+  {c:'しゃ',r:'sha'},{c:'しゅ',r:'shu'},{c:'しょ',r:'sho'},
+  {c:'ちゃ',r:'cha'},{c:'ちゅ',r:'chu'},{c:'ちょ',r:'cho'},
+  {c:'にゃ',r:'nya'},{c:'にゅ',r:'nyu'},{c:'にょ',r:'nyo'},
+  {c:'ひゃ',r:'hya'},{c:'ひゅ',r:'hyu'},{c:'ひょ',r:'hyo'},
+  {c:'みゃ',r:'mya'},{c:'みゅ',r:'myu'},{c:'みょ',r:'myo'},
+  {c:'りゃ',r:'rya'},{c:'りゅ',r:'ryu'},{c:'りょ',r:'ryo'},
+  {c:'ぎゃ',r:'gya'},{c:'ぎゅ',r:'gyu'},{c:'ぎょ',r:'gyo'},
+  {c:'じゃ',r:'ja'},{c:'じゅ',r:'ju'},{c:'じょ',r:'jo'},
+  {c:'びゃ',r:'bya'},{c:'びゅ',r:'byu'},{c:'びょ',r:'byo'},
+  {c:'ぴゃ',r:'pya'},{c:'ぴゅ',r:'pyu'},{c:'ぴょ',r:'pyo'},
 ];
 
 const katakana = [
+  // Basic
   {c:'ア',r:'a'},{c:'イ',r:'i'},{c:'ウ',r:'u'},{c:'エ',r:'e'},{c:'オ',r:'o'},
   {c:'カ',r:'ka'},{c:'キ',r:'ki'},{c:'ク',r:'ku'},{c:'ケ',r:'ke'},{c:'コ',r:'ko'},
   {c:'サ',r:'sa'},{c:'シ',r:'shi'},{c:'ス',r:'su'},{c:'セ',r:'se'},{c:'ソ',r:'so'},
@@ -304,56 +318,127 @@ const katakana = [
   {c:'ヤ',r:'ya'},{c:'ユ',r:'yu'},{c:'ヨ',r:'yo'},
   {c:'ラ',r:'ra'},{c:'リ',r:'ri'},{c:'ル',r:'ru'},{c:'レ',r:'re'},{c:'ロ',r:'ro'},
   {c:'ワ',r:'wa'},{c:'ヲ',r:'wo'},{c:'ン',r:'n'},
+  // Dakuten & handakuten
   {c:'ガ',r:'ga'},{c:'ギ',r:'gi'},{c:'グ',r:'gu'},{c:'ゲ',r:'ge'},{c:'ゴ',r:'go'},
   {c:'ザ',r:'za'},{c:'ジ',r:'ji'},{c:'ズ',r:'zu'},{c:'ゼ',r:'ze'},{c:'ゾ',r:'zo'},
   {c:'ダ',r:'da'},{c:'ヂ',r:'ji'},{c:'ヅ',r:'zu'},{c:'デ',r:'de'},{c:'ド',r:'do'},
   {c:'バ',r:'ba'},{c:'ビ',r:'bi'},{c:'ブ',r:'bu'},{c:'ベ',r:'be'},{c:'ボ',r:'bo'},
   {c:'パ',r:'pa'},{c:'ピ',r:'pi'},{c:'プ',r:'pu'},{c:'ペ',r:'pe'},{c:'ポ',r:'po'},
+  // Yōon
+  {c:'キャ',r:'kya'},{c:'キュ',r:'kyu'},{c:'キョ',r:'kyo'},
+  {c:'シャ',r:'sha'},{c:'シュ',r:'shu'},{c:'ショ',r:'sho'},
+  {c:'チャ',r:'cha'},{c:'チュ',r:'chu'},{c:'チョ',r:'cho'},
+  {c:'ニャ',r:'nya'},{c:'ニュ',r:'nyu'},{c:'ニョ',r:'nyo'},
+  {c:'ヒャ',r:'hya'},{c:'ヒュ',r:'hyu'},{c:'ヒョ',r:'hyo'},
+  {c:'ミャ',r:'mya'},{c:'ミュ',r:'myu'},{c:'ミョ',r:'myo'},
+  {c:'リャ',r:'rya'},{c:'リュ',r:'ryu'},{c:'リョ',r:'ryo'},
+  {c:'ギャ',r:'gya'},{c:'ギュ',r:'gyu'},{c:'ギョ',r:'gyo'},
+  {c:'ジャ',r:'ja'},{c:'ジュ',r:'ju'},{c:'ジョ',r:'jo'},
+  {c:'ビャ',r:'bya'},{c:'ビュ',r:'byu'},{c:'ビョ',r:'byo'},
+  {c:'ピャ',r:'pya'},{c:'ピュ',r:'pyu'},{c:'ピョ',r:'pyo'},
 ];
 
 const kanji = [
-  {c:'一',r:'ichi',m:'one'},{c:'二',r:'ni',m:'two'},{c:'三',r:'san',m:'three'},
-  {c:'四',r:'shi / yon',m:'four'},{c:'五',r:'go',m:'five'},{c:'六',r:'roku',m:'six'},
-  {c:'七',r:'shichi / nana',m:'seven'},{c:'八',r:'hachi',m:'eight'},{c:'九',r:'ku / kyuu',m:'nine'},
-  {c:'十',r:'juu',m:'ten'},{c:'百',r:'hyaku',m:'hundred'},{c:'千',r:'sen',m:'thousand'},
-  {c:'万',r:'man',m:'ten thousand'},{c:'円',r:'en',m:'yen / circle'},
-  {c:'年',r:'nen / toshi',m:'year'},{c:'月',r:'getsu / tsuki',m:'month / moon'},
-  {c:'日',r:'nichi / hi',m:'day / sun'},{c:'時',r:'ji / toki',m:'time / hour'},
-  {c:'分',r:'fun / pun',m:'minute'},{c:'半',r:'han',m:'half'},
-  {c:'今',r:'ima',m:'now'},{c:'前',r:'mae',m:'before / front'},{c:'後',r:'ato',m:'after / back'},
-  {c:'午',r:'go',m:'noon'},{c:'毎',r:'mai',m:'every'},{c:'何',r:'nani / nan',m:'what'},
-  {c:'山',r:'yama',m:'mountain'},{c:'川',r:'kawa',m:'river'},{c:'田',r:'ta',m:'rice field'},
-  {c:'木',r:'ki',m:'tree'},{c:'花',r:'hana',m:'flower'},{c:'空',r:'sora',m:'sky'},
-  {c:'雨',r:'ame',m:'rain'},{c:'火',r:'hi',m:'fire'},{c:'水',r:'mizu',m:'water'},
-  {c:'土',r:'tsuchi',m:'earth / soil'},{c:'金',r:'kin',m:'gold / money'},
-  {c:'人',r:'hito',m:'person'},{c:'男',r:'otoko',m:'man'},{c:'女',r:'onna',m:'woman'},
-  {c:'子',r:'ko',m:'child'},{c:'口',r:'kuchi',m:'mouth'},{c:'目',r:'me',m:'eye'},
-  {c:'耳',r:'mimi',m:'ear'},{c:'手',r:'te',m:'hand'},{c:'足',r:'ashi',m:'foot / leg'},
-  {c:'力',r:'chikara',m:'power / strength'},
-  {c:'上',r:'ue',m:'up / above'},{c:'下',r:'shita',m:'down / below'},
-  {c:'中',r:'naka',m:'inside / middle'},{c:'右',r:'migi',m:'right'},{c:'左',r:'hidari',m:'left'},
-  {c:'大',r:'oo / dai',m:'big'},{c:'小',r:'chii / shou',m:'small'},
-  {c:'高',r:'taka / kou',m:'high / expensive'},{c:'安',r:'yasu / an',m:'cheap / safe'},
-  {c:'新',r:'atara / shin',m:'new'},{c:'古',r:'furu / ko',m:'old'},
-  {c:'長',r:'naga / chou',m:'long'},{c:'白',r:'shiro',m:'white'},{c:'黒',r:'kuro',m:'black'},
-  {c:'赤',r:'aka',m:'red'},{c:'青',r:'ao',m:'blue'},
-  {c:'学',r:'mana / gaku',m:'study / learn'},{c:'校',r:'kou',m:'school'},
-  {c:'先',r:'saki / sen',m:'ahead / previous'},{c:'生',r:'sei / u',m:'life / birth'},
-  {c:'本',r:'hon',m:'book / origin'},{c:'文',r:'bun / mon',m:'writing / sentence'},
-  {c:'字',r:'ji',m:'character / letter'},{c:'語',r:'go',m:'language'},
-  {c:'国',r:'kuni / koku',m:'country'},{c:'外',r:'soto / gai',m:'outside'},
-  {c:'電',r:'den',m:'electricity'},{c:'車',r:'kuruma / sha',m:'car / vehicle'},
-  {c:'駅',r:'eki',m:'station'},
-  {c:'食',r:'tabe / shoku',m:'eat / food'},{c:'飲',r:'nomu / in',m:'drink'},
-  {c:'見',r:'miru',m:'see / look'},{c:'聞',r:'kiku',m:'listen / hear'},
-  {c:'読',r:'yomu',m:'read'},{c:'書',r:'kaku',m:'write'},{c:'話',r:'hanasu',m:'speak'},
-  {c:'行',r:'iku',m:'go'},{c:'来',r:'kuru',m:'come'},{c:'帰',r:'kaeru',m:'return home'},
-  {c:'入',r:'hairu',m:'enter'},{c:'出',r:'deru',m:'exit'},{c:'会',r:'au',m:'meet'},
-  {c:'待',r:'matsu',m:'wait'},{c:'買',r:'kau',m:'buy'},{c:'立',r:'tatsu',m:'stand'},
-  {c:'起',r:'okiru',m:'wake up / rise'},{c:'寝',r:'neru',m:'sleep'},
-  {c:'名',r:'na / mei',m:'name'},{c:'気',r:'ki',m:'spirit / feeling'},
-  {c:'雪',r:'yuki',m:'snow'},{c:'風',r:'kaze',m:'wind'},{c:'海',r:'umi',m:'sea / ocean'},
-  {c:'山',r:'yama',m:'mountain'},{c:'道',r:'michi',m:'road / way'},
+  // Grade 1 (80) — with meanings
+  {c:'一',r:'ichi',m:'one'},{c:'右',r:'migi',m:'right'},{c:'雨',r:'ame',m:'rain'},
+  {c:'円',r:'en',m:'yen'},{c:'王',r:'ou',m:'king'},{c:'音',r:'oto',m:'sound'},
+  {c:'下',r:'shita',m:'down'},{c:'火',r:'hi',m:'fire'},{c:'花',r:'hana',m:'flower'},
+  {c:'貝',r:'kai',m:'shellfish'},{c:'学',r:'gaku',m:'study'},{c:'気',r:'ki',m:'spirit'},
+  {c:'九',r:'ku',m:'nine'},{c:'休',r:'yasumu',m:'rest'},{c:'玉',r:'tama',m:'jewel'},
+  {c:'金',r:'kin',m:'gold'},{c:'空',r:'sora',m:'sky'},{c:'月',r:'tsuki',m:'moon'},
+  {c:'犬',r:'inu',m:'dog'},{c:'見',r:'miru',m:'see'},{c:'五',r:'go',m:'five'},
+  {c:'口',r:'kuchi',m:'mouth'},{c:'校',r:'kou',m:'school'},{c:'左',r:'hidari',m:'left'},
+  {c:'三',r:'san',m:'three'},{c:'山',r:'yama',m:'mountain'},{c:'子',r:'ko',m:'child'},
+  {c:'四',r:'shi',m:'four'},{c:'糸',r:'ito',m:'thread'},{c:'字',r:'ji',m:'character'},
+  {c:'耳',r:'mimi',m:'ear'},{c:'七',r:'shichi',m:'seven'},{c:'車',r:'kuruma',m:'car'},
+  {c:'手',r:'te',m:'hand'},{c:'十',r:'juu',m:'ten'},{c:'出',r:'deru',m:'exit'},
+  {c:'女',r:'onna',m:'woman'},{c:'小',r:'chii',m:'small'},{c:'上',r:'ue',m:'up'},
+  {c:'森',r:'mori',m:'forest'},{c:'人',r:'hito',m:'person'},{c:'水',r:'mizu',m:'water'},
+  {c:'正',r:'tadashii',m:'correct'},{c:'生',r:'sei',m:'life'},{c:'青',r:'ao',m:'blue'},
+  {c:'石',r:'ishi',m:'stone'},{c:'赤',r:'aka',m:'red'},{c:'千',r:'sen',m:'thousand'},
+  {c:'川',r:'kawa',m:'river'},{c:'先',r:'saki',m:'ahead'},{c:'早',r:'hayai',m:'early'},
+  {c:'草',r:'kusa',m:'grass'},{c:'足',r:'ashi',m:'foot'},{c:'村',r:'mura',m:'village'},
+  {c:'大',r:'oo',m:'big'},{c:'男',r:'otoko',m:'man'},{c:'竹',r:'take',m:'bamboo'},
+  {c:'中',r:'naka',m:'middle'},{c:'虫',r:'mushi',m:'insect'},{c:'町',r:'machi',m:'town'},
+  {c:'天',r:'ten',m:'heaven'},{c:'田',r:'ta',m:'rice field'},{c:'土',r:'tsuchi',m:'earth'},
+  {c:'二',r:'ni',m:'two'},{c:'日',r:'hi',m:'day'},{c:'入',r:'hairu',m:'enter'},
+  {c:'年',r:'nen',m:'year'},{c:'白',r:'shiro',m:'white'},{c:'八',r:'hachi',m:'eight'},
+  {c:'百',r:'hyaku',m:'hundred'},{c:'文',r:'bun',m:'writing'},{c:'木',r:'ki',m:'tree'},
+  {c:'本',r:'hon',m:'book'},{c:'名',r:'na',m:'name'},{c:'目',r:'me',m:'eye'},
+  {c:'立',r:'tatsu',m:'stand'},{c:'力',r:'chikara',m:'power'},{c:'林',r:'hayashi',m:'grove'},
+  {c:'六',r:'roku',m:'six'},
+  // Grade 2 (160)
+  {c:'引',r:'hiku'},{c:'羽',r:'hane'},{c:'雲',r:'kumo'},{c:'園',r:'en'},{c:'遠',r:'tooi'},
+  {c:'何',r:'nani'},{c:'科',r:'ka'},{c:'夏',r:'natsu'},{c:'家',r:'ie'},{c:'歌',r:'uta'},
+  {c:'画',r:'ga'},{c:'回',r:'kai'},{c:'会',r:'kai'},{c:'海',r:'umi'},{c:'絵',r:'e'},
+  {c:'外',r:'soto'},{c:'角',r:'kado'},{c:'活',r:'katsu'},{c:'間',r:'aida'},{c:'丸',r:'maru'},
+  {c:'岩',r:'iwa'},{c:'顔',r:'kao'},{c:'汽',r:'ki'},{c:'記',r:'ki'},{c:'帰',r:'kaeru'},
+  {c:'弓',r:'yumi'},{c:'牛',r:'ushi'},{c:'魚',r:'sakana'},{c:'京',r:'kyou'},{c:'強',r:'tsuyoi'},
+  {c:'教',r:'oshieru'},{c:'近',r:'chikai'},{c:'兄',r:'ani'},{c:'形',r:'katachi'},{c:'計',r:'hakaru'},
+  {c:'元',r:'moto'},{c:'言',r:'iu'},{c:'原',r:'hara'},{c:'戸',r:'to'},{c:'古',r:'furu'},
+  {c:'午',r:'go'},{c:'後',r:'ato'},{c:'語',r:'go'},{c:'工',r:'kou'},{c:'公',r:'ooyake'},
+  {c:'広',r:'hiroi'},{c:'交',r:'majiru'},{c:'光',r:'hikari'},{c:'考',r:'kangaeru'},{c:'行',r:'iku'},
+  {c:'高',r:'takai'},{c:'黄',r:'ki'},{c:'合',r:'au'},{c:'谷',r:'tani'},{c:'国',r:'kuni'},
+  {c:'黒',r:'kuro'},{c:'今',r:'ima'},{c:'才',r:'sai'},{c:'細',r:'hosoi'},{c:'作',r:'tsukuru'},
+  {c:'算',r:'san'},{c:'止',r:'tomeru'},{c:'市',r:'shi'},{c:'矢',r:'ya'},{c:'姉',r:'ane'},
+  {c:'思',r:'omou'},{c:'紙',r:'kami'},{c:'寺',r:'tera'},{c:'自',r:'jibun'},{c:'時',r:'toki'},
+  {c:'室',r:'shitsu'},{c:'社',r:'sha'},{c:'弱',r:'yowai'},{c:'首',r:'kubi'},{c:'秋',r:'aki'},
+  {c:'週',r:'shuu'},{c:'春',r:'haru'},{c:'書',r:'kaku'},{c:'少',r:'sukunai'},{c:'場',r:'ba'},
+  {c:'色',r:'iro'},{c:'食',r:'taberu'},{c:'心',r:'kokoro'},{c:'新',r:'atarashii'},{c:'親',r:'oya'},
+  {c:'図',r:'zu'},{c:'数',r:'kazu'},{c:'西',r:'nishi'},{c:'声',r:'koe'},{c:'星',r:'hoshi'},
+  {c:'晴',r:'hareru'},{c:'切',r:'kiru'},{c:'雪',r:'yuki'},{c:'船',r:'fune'},{c:'線',r:'sen'},
+  {c:'前',r:'mae'},{c:'組',r:'kumi'},{c:'走',r:'hashiru'},{c:'多',r:'ooi'},{c:'太',r:'futoi'},
+  {c:'体',r:'karada'},{c:'台',r:'dai'},{c:'地',r:'chi'},{c:'池',r:'ike'},{c:'知',r:'shiru'},
+  {c:'茶',r:'cha'},{c:'昼',r:'hiru'},{c:'長',r:'nagai'},{c:'鳥',r:'tori'},{c:'朝',r:'asa'},
+  {c:'直',r:'naosu'},{c:'通',r:'tooru'},{c:'弟',r:'otouto'},{c:'店',r:'mise'},{c:'点',r:'ten'},
+  {c:'電',r:'den'},{c:'刀',r:'katana'},{c:'冬',r:'fuyu'},{c:'当',r:'ataru'},{c:'東',r:'higashi'},
+  {c:'答',r:'kotaeru'},{c:'頭',r:'atama'},{c:'同',r:'onaji'},{c:'道',r:'michi'},{c:'読',r:'yomu'},
+  {c:'内',r:'uchi'},{c:'南',r:'minami'},{c:'肉',r:'niku'},{c:'馬',r:'uma'},{c:'売',r:'uru'},
+  {c:'買',r:'kau'},{c:'麦',r:'mugi'},{c:'半',r:'han'},{c:'番',r:'ban'},{c:'父',r:'chichi'},
+  {c:'風',r:'kaze'},{c:'分',r:'fun'},{c:'聞',r:'kiku'},{c:'米',r:'kome'},{c:'歩',r:'aruku'},
+  {c:'母',r:'haha'},{c:'方',r:'kata'},{c:'北',r:'kita'},{c:'毎',r:'mai'},{c:'妹',r:'imouto'},
+  {c:'万',r:'man'},{c:'明',r:'akarui'},{c:'鳴',r:'naku'},{c:'毛',r:'ke'},{c:'門',r:'mon'},
+  {c:'夜',r:'yoru'},{c:'野',r:'no'},{c:'友',r:'tomo'},{c:'用',r:'you'},{c:'曜',r:'you'},
+  {c:'来',r:'kuru'},{c:'里',r:'sato'},{c:'理',r:'ri'},{c:'話',r:'hanasu'},
+  // Grade 3 (200)
+  {c:'悪',r:'warui'},{c:'安',r:'yasui'},{c:'暗',r:'kurai'},{c:'医',r:'i'},{c:'委',r:'i'},
+  {c:'意',r:'i'},{c:'育',r:'sodateru'},{c:'員',r:'in'},{c:'院',r:'in'},{c:'飲',r:'nomu'},
+  {c:'運',r:'hakobu'},{c:'泳',r:'oyogu'},{c:'駅',r:'eki'},{c:'央',r:'ou'},{c:'横',r:'yoko'},
+  {c:'屋',r:'ya'},{c:'温',r:'atataka'},{c:'化',r:'ka'},{c:'荷',r:'ni'},{c:'界',r:'kai'},
+  {c:'開',r:'akeru'},{c:'階',r:'kai'},{c:'寒',r:'samui'},{c:'感',r:'kan'},{c:'漢',r:'kan'},
+  {c:'館',r:'kan'},{c:'岸',r:'kishi'},{c:'起',r:'okiru'},{c:'期',r:'ki'},{c:'客',r:'kyaku'},
+  {c:'急',r:'kyuu'},{c:'究',r:'kyuu'},{c:'泣',r:'naku'},{c:'去',r:'saru'},{c:'橋',r:'hashi'},
+  {c:'業',r:'gyou'},{c:'曲',r:'kyoku'},{c:'局',r:'kyoku'},{c:'銀',r:'gin'},{c:'区',r:'ku'},
+  {c:'苦',r:'kurushii'},{c:'具',r:'gu'},{c:'君',r:'kimi'},{c:'係',r:'kakari'},{c:'軽',r:'karui'},
+  {c:'血',r:'chi'},{c:'決',r:'kimeru'},{c:'研',r:'ken'},{c:'県',r:'ken'},{c:'庫',r:'ko'},
+  {c:'湖',r:'ko'},{c:'向',r:'muku'},{c:'幸',r:'shiawase'},{c:'港',r:'minato'},{c:'号',r:'gou'},
+  {c:'根',r:'ne'},{c:'祭',r:'matsuri'},{c:'皿',r:'sara'},{c:'仕',r:'shi'},{c:'死',r:'shinu'},
+  {c:'使',r:'tsukau'},{c:'始',r:'hajimeru'},{c:'指',r:'yubi'},{c:'歯',r:'ha'},{c:'詩',r:'shi'},
+  {c:'次',r:'tsugi'},{c:'事',r:'koto'},{c:'持',r:'motsu'},{c:'式',r:'shiki'},{c:'実',r:'mi'},
+  {c:'写',r:'utsusu'},{c:'者',r:'mono'},{c:'主',r:'omo'},{c:'守',r:'mamoru'},{c:'取',r:'toru'},
+  {c:'酒',r:'sake'},{c:'受',r:'ukeru'},{c:'州',r:'shuu'},{c:'拾',r:'hirou'},{c:'終',r:'owaru'},
+  {c:'習',r:'narau'},{c:'集',r:'atsumeru'},{c:'住',r:'sumu'},{c:'重',r:'omoi'},{c:'宿',r:'yado'},
+  {c:'所',r:'tokoro'},{c:'暑',r:'atsui'},{c:'助',r:'tasukeru'},{c:'勝',r:'katsu'},{c:'商',r:'akindo'},
+  {c:'消',r:'kesu'},{c:'植',r:'ueru'},{c:'申',r:'mousu'},{c:'身',r:'mi'},{c:'神',r:'kami'},
+  {c:'真',r:'ma'},{c:'深',r:'fukai'},{c:'進',r:'susumu'},{c:'世',r:'yo'},{c:'整',r:'totonoeru'},
+  {c:'昔',r:'mukashi'},{c:'全',r:'zen'},{c:'想',r:'sou'},{c:'息',r:'iki'},{c:'速',r:'hayai'},
+  {c:'族',r:'zoku'},{c:'他',r:'ta'},{c:'打',r:'utsu'},{c:'対',r:'tai'},{c:'待',r:'matsu'},
+  {c:'代',r:'yo'},{c:'第',r:'dai'},{c:'題',r:'dai'},{c:'炭',r:'sumi'},{c:'短',r:'mijikai'},
+  {c:'談',r:'dan'},{c:'着',r:'kiru'},{c:'注',r:'chuu'},{c:'柱',r:'hashira'},{c:'帳',r:'chou'},
+  {c:'調',r:'shiraberu'},{c:'追',r:'ou'},{c:'定',r:'sadameru'},{c:'庭',r:'niwa'},{c:'笛',r:'fue'},
+  {c:'鉄',r:'tetsu'},{c:'転',r:'korogaru'},{c:'都',r:'miyako'},{c:'度',r:'do'},{c:'投',r:'nageru'},
+  {c:'豆',r:'mame'},{c:'島',r:'shima'},{c:'湯',r:'yu'},{c:'登',r:'noboru'},{c:'等',r:'nado'},
+  {c:'動',r:'ugoku'},{c:'童',r:'warabe'},{c:'農',r:'nou'},{c:'波',r:'nami'},{c:'配',r:'kubaru'},
+  {c:'倍',r:'bai'},{c:'箱',r:'hako'},{c:'畑',r:'hatake'},{c:'発',r:'hatsu'},{c:'反',r:'han'},
+  {c:'坂',r:'saka'},{c:'板',r:'ita'},{c:'皮',r:'kawa'},{c:'悲',r:'kanashii'},{c:'美',r:'utsukushii'},
+  {c:'鼻',r:'hana'},{c:'筆',r:'fude'},{c:'氷',r:'koori'},{c:'表',r:'hyou'},{c:'秒',r:'byou'},
+  {c:'品',r:'shina'},{c:'負',r:'makeru'},{c:'部',r:'bu'},{c:'服',r:'fuku'},{c:'福',r:'fuku'},
+  {c:'物',r:'mono'},{c:'平',r:'taira'},{c:'返',r:'kaesu'},{c:'勉',r:'ben'},{c:'放',r:'hanasu'},
+  {c:'味',r:'aji'},{c:'命',r:'inochi'},{c:'面',r:'men'},{c:'問',r:'tou'},{c:'役',r:'yaku'},
+  {c:'薬',r:'kusuri'},{c:'由',r:'yoshi'},{c:'油',r:'abura'},{c:'有',r:'aru'},{c:'遊',r:'asobu'},
+  {c:'予',r:'yo'},{c:'洋',r:'you'},{c:'葉',r:'ha'},{c:'陽',r:'you'},{c:'様',r:'sama'},
+  {c:'落',r:'ochiru'},{c:'流',r:'nagaru'},{c:'旅',r:'tabi'},{c:'両',r:'ryou'},{c:'緑',r:'midori'},
+  {c:'礼',r:'rei'},{c:'列',r:'retsu'},{c:'練',r:'neru'},{c:'路',r:'michi'},{c:'和',r:'wa'},
 ];
 
 const DECKS = [
@@ -379,7 +464,7 @@ function buildQueue() {
   } else {
     if(active.has('hiragana')) cards.push(...hiragana.map(c=>({...c,deck:'Hiragana'})));
     if(active.has('katakana')) cards.push(...katakana.map(c=>({...c,deck:'Katakana'})));
-    if(active.has('kanji')) cards.push(...kanji.map(c=>({...c,deck:'Kanji'})));
+    if(active.has('kanji'))    cards.push(...kanji.map(c=>({...c,deck:'Kanji'})));
   }
   queue=shuffle(cards); idx=0; flipped=false;
 }
@@ -391,7 +476,7 @@ function renderDecks() {
     b.className='deck-btn'+(active.has(d.id)?' active':'');
     b.dataset.id=d.id;
     b.innerHTML=`<span class="dot"></span>${d.label}`;
-    b.onclick=()=>toggle(d.id);
+    b.addEventListener('click',()=>toggle(d.id));
     el.appendChild(b);
   });
 }
@@ -412,14 +497,15 @@ function renderCard() {
         <div class="done-kanji">完</div>
         <div class="done-title">Round complete</div>
         <div class="done-sub">You went through all ${queue.length} cards.<br>Ready for another round?</div>
-        <button class="restart-btn" onclick="restart()">Shuffle again</button>
+        <button class="restart-btn" id="restartBtn">Shuffle again</button>
       </div>`;
+    document.getElementById('restartBtn').addEventListener('click', restart);
     return;
   }
   const card=queue[idx];
   const pct=Math.round((idx/queue.length)*100);
   area.innerHTML=`
-    <div class="scene" id="scene" onclick="flip()" role="button" aria-label="Flip card">
+    <div class="scene" id="scene" role="button" aria-label="Flip card">
       <div class="card-inner" id="ci">
         <div class="face front">
           <span class="deck-badge">${card.deck}</span>
@@ -435,7 +521,7 @@ function renderCard() {
       </div>
     </div>
     <div class="controls">
-      <button class="nav-btn" onclick="prev()">
+      <button class="nav-btn" id="prevBtn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
         Back
       </button>
@@ -443,11 +529,14 @@ function renderCard() {
         <div class="progress-count">${idx+1} / ${queue.length}</div>
         <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
       </div>
-      <button class="nav-btn" onclick="next()">
+      <button class="nav-btn" id="nextBtn">
         Next
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
       </button>
     </div>`;
+  document.getElementById('scene').addEventListener('click', flip);
+  document.getElementById('prevBtn').addEventListener('click', prev);
+  document.getElementById('nextBtn').addEventListener('click', next);
   flipped=false;
 }
 
