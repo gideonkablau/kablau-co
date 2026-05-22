@@ -11,8 +11,8 @@ A personal site. Gideon shares his own projects, thoughts, and experiences.
 - Feels handcrafted, not like a generic tech blog
 
 ## Colors
-- Background: #0f0f0e
-- Surface: #1a1a18
+- Background: #1c1c1b
+- Surface: #272725
 - Text: #f0ede6
 - Muted: #888780
 - Border: rgba(255,255,255,0.08)
