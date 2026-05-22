@@ -17,7 +17,7 @@ const projects = defineCollection({
   schema: z.object({
     title: z.string(),
     description: z.string(),
-    url: z.string().url().optional(),
+    url: z.union([z.string().url(), z.string().startsWith('/')]).optional(),
     github: z.string().url().optional(),
     date: z.coerce.date(),
     draft: z.boolean().default(false),

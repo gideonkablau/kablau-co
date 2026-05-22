@@ -1,0 +1,417 @@
+---
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Japanese Flashcards">
+<meta name="theme-color" content="#0f0f0e">
+<title>Japanese Flashcards — kablau.co</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f0f0e;
+    --surface: #1a1a18;
+    --surface2: #252522;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #f0ede6;
+    --muted: #888780;
+    --faint: #444441;
+    --hiragana: #9F97DD;
+    --katakana: #5DCAA5;
+    --mixed: #EF9F27;
+    --radius: 16px;
+    --font: -apple-system, 'Hiragino Sans', 'Yu Gothic', sans-serif;
+  }
+
+  html { background: var(--bg); color: var(--text); font-family: var(--font); }
+
+  body {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: env(safe-area-inset-top, 16px) 20px env(safe-area-inset-bottom, 20px);
+    padding-top: max(env(safe-area-inset-top), 24px);
+  }
+
+  .header {
+    width: 100%;
+    max-width: 520px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 0 0 28px;
+  }
+  .logo {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    text-decoration: none;
+  }
+  .logo span { color: var(--muted); font-weight: 400; font-size: 14px; margin-left: 6px; }
+  .back-link {
+    font-size: 12px;
+    color: var(--faint);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .back-link:hover { color: var(--muted); }
+
+  .decks {
+    width: 100%;
+    max-width: 520px;
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .deck-btn {
+    flex: 1;
+    min-width: 90px;
+    padding: 10px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: var(--font);
+    letter-spacing: 0.01em;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .deck-btn .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .deck-btn:hover { border-color: var(--border2); color: var(--text); }
+  .deck-btn.active { border-color: transparent; color: #0f0f0e; }
+  .deck-btn.active .dot { opacity: 1; }
+  .deck-btn.active[data-id="hiragana"] { background: var(--hiragana); }
+  .deck-btn.active[data-id="katakana"] { background: var(--katakana); }
+  .deck-btn.active[data-id="mixed"] { background: var(--mixed); }
+
+  .scene {
+    width: 100%;
+    max-width: 520px;
+    aspect-ratio: 1.55;
+    perspective: 1200px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .card-inner {
+    width: 100%; height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .card-inner.flipped { transform: rotateY(180deg); }
+
+  .face {
+    position: absolute; inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    user-select: none;
+  }
+  .face.back { transform: rotateY(180deg); }
+
+  .char {
+    font-size: clamp(72px, 18vw, 112px);
+    line-height: 1;
+    color: var(--text);
+    font-weight: 300;
+  }
+  .romaji {
+    font-size: clamp(22px, 5vw, 32px);
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.08em;
+  }
+  .char-back { font-size: clamp(44px, 10vw, 64px); color: var(--muted); font-weight: 300; margin-top: 4px; }
+  .face-hint {
+    position: absolute;
+    bottom: 16px;
+    font-size: 11px;
+    color: var(--faint);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .deck-badge {
+    position: absolute;
+    top: 14px; left: 16px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  .controls {
+    width: 100%;
+    max-width: 520px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 18px;
+    gap: 12px;
+  }
+  .nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 14px;
+    font-family: var(--font);
+    font-weight: 500;
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .nav-btn:hover { border-color: var(--border2); color: var(--text); }
+  .nav-btn:active { transform: scale(0.96); }
+  .nav-btn svg { width: 16px; height: 16px; }
+
+  .progress {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .progress-count {
+    font-size: 13px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .progress-bar {
+    width: 80px; height: 2px;
+    background: var(--surface2);
+    border-radius: 1px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 1px;
+    background: var(--muted);
+    transition: width 0.3s ease;
+  }
+
+  .done-screen {
+    width: 100%; max-width: 520px;
+    display: flex; flex-direction: column;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 48px 32px;
+    gap: 12px;
+    text-align: center;
+  }
+  .done-kanji { font-size: 64px; line-height: 1; margin-bottom: 8px; }
+  .done-title { font-size: 20px; font-weight: 600; }
+  .done-sub { font-size: 14px; color: var(--muted); line-height: 1.6; }
+  .restart-btn {
+    margin-top: 16px;
+    padding: 12px 28px;
+    border-radius: 999px;
+    border: 1px solid var(--border2);
+    background: transparent;
+    color: var(--text);
+    font-size: 14px;
+    font-family: var(--font);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .restart-btn:hover { background: var(--surface2); }
+  .restart-btn:active { transform: scale(0.97); }
+
+  @media (max-width: 400px) {
+    body { padding-left: 14px; padding-right: 14px; }
+    .nav-btn { padding: 10px 14px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a class="logo" href="#">Japanese <span>Flashcards</span></a>
+  <a class="back-link" href="/projects">← Projects</a>
+</header>
+
+<div class="decks" id="deckSelector"></div>
+
+<div id="cardArea" style="width:100%;max-width:520px;"></div>
+
+<script>
+const hiragana = [
+  {c:'あ',r:'a'},{c:'い',r:'i'},{c:'う',r:'u'},{c:'え',r:'e'},{c:'お',r:'o'},
+  {c:'か',r:'ka'},{c:'き',r:'ki'},{c:'く',r:'ku'},{c:'け',r:'ke'},{c:'こ',r:'ko'},
+  {c:'さ',r:'sa'},{c:'し',r:'shi'},{c:'す',r:'su'},{c:'せ',r:'se'},{c:'そ',r:'so'},
+  {c:'た',r:'ta'},{c:'ち',r:'chi'},{c:'つ',r:'tsu'},{c:'て',r:'te'},{c:'と',r:'to'},
+  {c:'な',r:'na'},{c:'に',r:'ni'},{c:'ぬ',r:'nu'},{c:'ね',r:'ne'},{c:'の',r:'no'},
+  {c:'は',r:'ha'},{c:'ひ',r:'hi'},{c:'ふ',r:'fu'},{c:'へ',r:'he'},{c:'ほ',r:'ho'},
+  {c:'ま',r:'ma'},{c:'み',r:'mi'},{c:'む',r:'mu'},{c:'め',r:'me'},{c:'も',r:'mo'},
+  {c:'や',r:'ya'},{c:'ゆ',r:'yu'},{c:'よ',r:'yo'},
+  {c:'ら',r:'ra'},{c:'り',r:'ri'},{c:'る',r:'ru'},{c:'れ',r:'re'},{c:'ろ',r:'ro'},
+  {c:'わ',r:'wa'},{c:'を',r:'wo'},{c:'ん',r:'n'},
+  {c:'が',r:'ga'},{c:'ぎ',r:'gi'},{c:'ぐ',r:'gu'},{c:'げ',r:'ge'},{c:'ご',r:'go'},
+  {c:'ざ',r:'za'},{c:'じ',r:'ji'},{c:'ず',r:'zu'},{c:'ぜ',r:'ze'},{c:'ぞ',r:'zo'},
+  {c:'だ',r:'da'},{c:'ぢ',r:'ji'},{c:'づ',r:'zu'},{c:'で',r:'de'},{c:'ど',r:'do'},
+  {c:'ば',r:'ba'},{c:'び',r:'bi'},{c:'ぶ',r:'bu'},{c:'べ',r:'be'},{c:'ぼ',r:'bo'},
+  {c:'ぱ',r:'pa'},{c:'ぴ',r:'pi'},{c:'ぷ',r:'pu'},{c:'ぺ',r:'pe'},{c:'ぽ',r:'po'},
+];
+
+const katakana = [
+  {c:'ア',r:'a'},{c:'イ',r:'i'},{c:'ウ',r:'u'},{c:'エ',r:'e'},{c:'オ',r:'o'},
+  {c:'カ',r:'ka'},{c:'キ',r:'ki'},{c:'ク',r:'ku'},{c:'ケ',r:'ke'},{c:'コ',r:'ko'},
+  {c:'サ',r:'sa'},{c:'シ',r:'shi'},{c:'ス',r:'su'},{c:'セ',r:'se'},{c:'ソ',r:'so'},
+  {c:'タ',r:'ta'},{c:'チ',r:'chi'},{c:'ツ',r:'tsu'},{c:'テ',r:'te'},{c:'ト',r:'to'},
+  {c:'ナ',r:'na'},{c:'ニ',r:'ni'},{c:'ヌ',r:'nu'},{c:'ネ',r:'ne'},{c:'ノ',r:'no'},
+  {c:'ハ',r:'ha'},{c:'ヒ',r:'hi'},{c:'フ',r:'fu'},{c:'ヘ',r:'he'},{c:'ホ',r:'ho'},
+  {c:'マ',r:'ma'},{c:'ミ',r:'mi'},{c:'ム',r:'mu'},{c:'メ',r:'me'},{c:'モ',r:'mo'},
+  {c:'ヤ',r:'ya'},{c:'ユ',r:'yu'},{c:'ヨ',r:'yo'},
+  {c:'ラ',r:'ra'},{c:'リ',r:'ri'},{c:'ル',r:'ru'},{c:'レ',r:'re'},{c:'ロ',r:'ro'},
+  {c:'ワ',r:'wa'},{c:'ヲ',r:'wo'},{c:'ン',r:'n'},
+  {c:'ガ',r:'ga'},{c:'ギ',r:'gi'},{c:'グ',r:'gu'},{c:'ゲ',r:'ge'},{c:'ゴ',r:'go'},
+  {c:'ザ',r:'za'},{c:'ジ',r:'ji'},{c:'ズ',r:'zu'},{c:'ゼ',r:'ze'},{c:'ゾ',r:'zo'},
+  {c:'ダ',r:'da'},{c:'ヂ',r:'ji'},{c:'ヅ',r:'zu'},{c:'デ',r:'de'},{c:'ド',r:'do'},
+  {c:'バ',r:'ba'},{c:'ビ',r:'bi'},{c:'ブ',r:'bu'},{c:'ベ',r:'be'},{c:'ボ',r:'bo'},
+  {c:'パ',r:'pa'},{c:'ピ',r:'pi'},{c:'プ',r:'pu'},{c:'ペ',r:'pe'},{c:'ポ',r:'po'},
+];
+
+const DECKS = [
+  { id:'hiragana', label:'Hiragana', color:'var(--hiragana)' },
+  { id:'katakana', label:'Katakana', color:'var(--katakana)' },
+  { id:'mixed',    label:'Mixed',    color:'var(--mixed)' },
+];
+
+let active = new Set(['hiragana']);
+let queue = [], idx = 0, flipped = false;
+
+function shuffle(a) {
+  const b=[...a];
+  for(let i=b.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[b[i],b[j]]=[b[j],b[i]];}
+  return b;
+}
+
+function buildQueue() {
+  let cards=[];
+  if(active.has('mixed')){
+    cards=[...hiragana.map(c=>({...c,deck:'Hiragana'})),...katakana.map(c=>({...c,deck:'Katakana'}))];
+  } else {
+    if(active.has('hiragana')) cards.push(...hiragana.map(c=>({...c,deck:'Hiragana'})));
+    if(active.has('katakana')) cards.push(...katakana.map(c=>({...c,deck:'Katakana'})));
+  }
+  queue=shuffle(cards); idx=0; flipped=false;
+}
+
+function renderDecks() {
+  const el=document.getElementById('deckSelector'); el.innerHTML='';
+  DECKS.forEach(d=>{
+    const b=document.createElement('button');
+    b.className='deck-btn'+(active.has(d.id)?' active':'');
+    b.dataset.id=d.id;
+    b.innerHTML=`<span class="dot"></span>${d.label}`;
+    b.onclick=()=>toggle(d.id);
+    el.appendChild(b);
+  });
+}
+
+function toggle(id) {
+  if(id==='mixed'){active.clear();if(!active.has('mixed'))active.add('mixed');}
+  else{active.delete('mixed');active.has(id)?active.delete(id):active.add(id);}
+  if(!active.size) active.add(id);
+  buildQueue(); renderDecks(); renderCard();
+}
+
+function renderCard() {
+  const area=document.getElementById('cardArea');
+  if(!queue.length){area.innerHTML='<p style="color:var(--muted);text-align:center;padding:3rem 0;font-size:14px;">No deck selected.</p>';return;}
+  if(idx>=queue.length){
+    area.innerHTML=`
+      <div class="done-screen">
+        <div class="done-kanji">完</div>
+        <div class="done-title">Round complete</div>
+        <div class="done-sub">You went through all ${queue.length} cards.<br>Ready for another round?</div>
+        <button class="restart-btn" onclick="restart()">Shuffle again</button>
+      </div>`;
+    return;
+  }
+  const card=queue[idx];
+  const pct=Math.round((idx/queue.length)*100);
+  area.innerHTML=`
+    <div class="scene" id="scene" onclick="flip()" role="button" aria-label="Flip card">
+      <div class="card-inner" id="ci">
+        <div class="face front">
+          <span class="deck-badge">${card.deck}</span>
+          <span class="char">${card.c}</span>
+          <span class="face-hint">Tap to reveal</span>
+        </div>
+        <div class="face back">
+          <span class="deck-badge">${card.deck}</span>
+          <span class="romaji">${card.r}</span>
+          <span class="char-back">${card.c}</span>
+        </div>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="nav-btn" onclick="prev()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        Back
+      </button>
+      <div class="progress">
+        <div class="progress-count">${idx+1} / ${queue.length}</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+      </div>
+      <button class="nav-btn" onclick="next()">
+        Next
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>`;
+  flipped=false;
+}
+
+function flip(){flipped=!flipped;const ci=document.getElementById('ci');if(ci)ci.classList.toggle('flipped',flipped);}
+function next(){idx++;renderCard();}
+function prev(){if(idx>0){idx--;renderCard();}}
+function restart(){buildQueue();renderCard();}
+
+document.addEventListener('keydown',e=>{
+  if(e.key===' '||e.key==='Enter'){e.preventDefault();flip();}
+  else if(e.key==='ArrowRight')next();
+  else if(e.key==='ArrowLeft')prev();
+});
+
+buildQueue(); renderDecks(); renderCard();
+</script>
+</body>
+</html>
