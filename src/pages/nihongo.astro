@@ -92,13 +92,6 @@
     justify-content: center;
     gap: 6px;
   }
-  .deck-btn .dot {
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    background: currentColor;
-    opacity: 0;
-    transition: opacity 0.15s;
-  }
   .deck-btn:hover { border-color: var(--border2); color: var(--text); }
   .deck-btn.active { border-color: transparent; color: #0f0f0e; }
   .deck-btn.active .dot { opacity: 1; }
@@ -472,7 +465,7 @@ function renderDecks() {
     const b=document.createElement('button');
     b.className='deck-btn'+(active.has(d.id)?' active':'');
     b.dataset.id=d.id;
-    b.innerHTML=`<span class="dot"></span>${d.label}`;
+    b.innerHTML=d.label;
     b.addEventListener('click',()=>toggle(d.id));
     el.appendChild(b);
   });
